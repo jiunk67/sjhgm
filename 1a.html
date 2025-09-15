@@ -126,7 +126,7 @@
         
         <div class="input-group">
             <label for="secretNumber">请输入</label>
-            <input type="number" id="secretNumber" placeholder="输入1-10之间的特定数字" min="1" max="999999">
+            <input type="number" id="secretNumber" placeholder="输入管理员给的密码" min="1" max="999999">
         </div>
         
         <button class="decode-btn" onclick="decodeSecret()">尝试获取</button>
@@ -140,7 +140,7 @@
     </div>
 
     <script>
-        // 预设的10组数字和对应的Base64编码句子
+        
         const secretData = [
             {
                 number:357357,
