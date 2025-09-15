@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10个按钮跳转页面</title>
+    <style>
+        /* 页面基础样式 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* 按钮容器样式 */
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* 按钮基础样式 */
+        .redirect-button {
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .redirect-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        .redirect-button:active {
+            transform: translateY(0);
+        }
+
+        /* 响应式设计：小屏幕调整 */
+        @media (max-width: 600px) {
+            .button-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .redirect-button {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>跳转页面按钮组</h1>
+    
+    <!-- 按钮容器 -->
+    <div class="button-container">
+        <!-- 10个按钮，依次跳转至1a.html至10a.html -->
+        <button class="redirect-button" onclick="redirectToPage('1a.html')">按钮 1</button>
+        <button class="redirect-button" onclick="redirectToPage('2a.html')">按钮 2</button>
+        <button class="redirect-button" onclick="redirectToPage('3a.html')">按钮 3</button>
+        <button class="redirect-button" onclick="redirectToPage('4a.html')">按钮 4</button>
+        <button class="redirect-button" onclick="redirectToPage('5a.html')">按钮 5</button>
+        <button class="redirect-button" onclick="redirectToPage('6a.html')">按钮 6</button>
+        <button class="redirect-button" onclick="redirectToPage('7a.html')">按钮 7</button>
+        <button class="redirect-button" onclick="redirectToPage('8a.html')">按钮 8</button>
+        <button class="redirect-button" onclick="redirectToPage('9a.html')">按钮 9</button>
+        <button class="redirect-button" onclick="redirectToPage('10a.html')">按钮 10</button>
+    </div>
+
+    <script>
+        /**
+         * 页面跳转函数
+         * @param {string} url - 目标页面的URL路径
+         */
+        function redirectToPage(url) {
+            // 使用window.location.href实现页面跳转
+            window.location.href = url;
+            
+            // 可选：添加跳转前的确认提示（取消注释即可启用）
+            // if (confirm(`确定要跳转到 ${url} 吗？`)) {
+            //     window.location.href = url;
+            // }
+        }
+    </script>
+</body>
+</html>

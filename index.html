@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统授权访问</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .auth-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+        button {
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        #message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            opacity: 1;
+        }
+        .success {
+            color: #388e3c;
+            background-color: #e8f5e9;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>系统授权访问</h1>
+        <div class="input-group">
+            <input type="password" id="passwordInput" placeholder="密码错误无提示，正确后自动跳转" autocomplete="off">
+        </div>
+        <button onclick="verifyPassword()">验证授权</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD_BASE64 = "NjY2NjY2";
+        
+        function base64Decode(base64String) {
+            try {
+                return atob(base64String);
+            } catch (error) {
+                console.error("Base64解码错误:", error);
+                return null;
+            }
+        }
+        
+        function verifyPassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const messageElement = document.getElementById('message');
+            const inputPassword = passwordInput.value.trim();
+            
+            messageElement.textContent = '';
+            messageElement.className = '';
+            
+            if (!inputPassword) {
+                showMessage("请输入密码", "error");
+                passwordInput.focus();
+                return;
+            }
+            
+            const decodedCorrectPassword = base64Decode(CORRECT_PASSWORD_BASE64);
+            
+            if (decodedCorrectPassword === null) {
+                showMessage("系统错误，无法验证密码", "error");
+                return;
+            }
+            
+            if (inputPassword === decodedCorrectPassword) {
+                showMessage("验证成功！正在跳转...", "success");
+                setTimeout(() => {
+                    window.location.href = "an.html";
+                }, 1000);
+            } else {
+                showMessage("密码错误！请找管理员获取正确密码", "error");
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+            messageElement.className = type;
+        }
+        
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyPassword();
+            }
+        });
+    </script>
+</body>
+</html>
