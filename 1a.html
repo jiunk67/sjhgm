@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            font-size: 16px;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .decode-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+        
+        .decode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .decode-btn:active {
+            transform: translateY(0);
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+        
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>账号获取</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+<br>
+            
+        </p>
+        
+        <div class="input-group">
+            <label for="secretNumber">请输入</label>
+            <input type="number" id="secretNumber" placeholder="输入1-10之间的特定数字" min="1" max="999999">
+        </div>
+        
+        <button class="decode-btn" onclick="decodeSecret()">尝试获取</button>
+        
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+    
+    <div id="copyNotification" class="copy-notification">
+        ✅ 内容已复制到剪贴板！
+    </div>
+
+    <script>
+        // 预设的10组数字和对应的Base64编码句子
+        const secretData = [
+            {
+                number:357357,
+                encodedSentence: "MzgzMzEzNzU0OC0tLS13dzExMjIzMw=="
+            },
+            {
+                number: 67890,
+                encodedSentence: "Mzg2MjEwNjQ4Mi0tLS1iNzIxNDM0NQ=="
+            },
+            {
+                number: 696969,
+                encodedSentence: "Mzg1NzkwMTczNi0tLS1lZ3d1ODk1NTg="
+            },
+            {
+                number: 080855,
+                encodedSentence: "Mzg0MTQxMjMzMC0tLS1sNDI4MTg3NTkz"
+            },
+            {
+                number: 33333,
+                encodedSentence: "WW91ciBzaGlwIGlzIGJlaW5nIHRyeWluZyEgSG93IGRvIHlvdSBkb24ndCBub3Qgc2VlIGl0Pw=="
+            },
+            {
+                number: 44444,
+                encodedSentence: "VGhpcyBpcyBhIHRlc3QgbWVzc2FnZSBmb3IgdGhlIGFwcC4gV2VsY29tZSE="
+            },
+            {
+                number: 55555,
+                encodedSentence: "Rm9yZ2V0IHlvdXIgZmllbGQgb2YgdGhpbmcsIGFuZCB5b3Ugd2lsbCBmaW5kIHRoZSBwYXRoLg=="
+            },
+            {
+                number: 66666,
+                encodedSentence: "SSBhbSBub3QganVkZ2U/IEkgYW0ganVkZ2U/IEkgYW0ganVkZ2U/IFlvdSBkbyBub3Qga25vdyE="
+            },
+            {
+                number: 77777,
+                encodedSentence: "VGhpcyBpcyB0aGUgbGFzdCBvbmU/IEFsbCBvZiB0aGUgZm9vdGVyIGFyZSBiZWluZyBzZXQgdXAgZm9yIHlvdS4="
+            },
+            {
+                number: 88888,
+                encodedSentence: "QWxsIHlvdXIgcmVzdGF1cmFudHMgYXJlIGNvb2tpbmcgeW91IHRvIHRyeSB0aGlzLiBUaGlzIGlzIHRoZSBmYXN0ZXN0IG9mIHRoZSBhcHAu"
+            }
+        ];
+
+        function base64Encode(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+
+        function base64Decode(str) {
+            try {
+                return decodeURIComponent(escape(atob(str)));
+            } catch (e) {
+                throw new Error("失败");
+            }
+        }
+
+        function findSecretByNumber(inputNumber) {
+
+            const num = parseInt(inputNumber);
+            if (isNaN(num)) {
+                throw new Error("请输入有效的数字");
+            }
+
+
+            const secret = secretData.find(item => item.number === num);
+            
+            if (!secret) {
+                throw new Error("空");
+            }
+
+            return secret;
+        }
+
+        function decodeSecret() {
+            const inputNumber = document.getElementById('secretNumber').value.trim();
+            const successDiv = document.getElementById('successMessage');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            
+            successDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            if (!inputNumber) {
+                showError("请输入密码");
+                return;
+            }
+
+            try {
+
+                const secret = findSecretByNumber(inputNumber);
+                
+             
+                const decodedSentence = base64Decode(secret.encodedSentence);
+                
+                
+                showSuccess(`！数字 ${secret.number} 获取成功`);
+                showSecretInPopup(decodedSentence);
+                
+            } catch (error) {
+                showError("❌ " + error.message + "\n\n💡 错误，请寻找管理员");
+            }
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSecretInPopup(sentence) {
+            // 创建自定义弹窗
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 90%;
+                max-height: 80%;
+                width: 500px;
+                font-family: Arial, sans-serif;
+            `;
+
+            const title = document.createElement('h3');
+            title.textContent = '🔓';
+            title.style.cssText = 'margin: 0 0 20px 0; color: #333; font-size: 20px;';
+
+            const content = document.createElement('div');
+            content.textContent = sentence;
+            content.style.cssText = 'background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #e9ecef; word-break: break-all; line-height: 1.6; font-size: 16px; min-height: 60px;';
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = 'text-align: right; margin-top: 20px;';
+
+            const copyBtn = document.createElement('button');
+            copyBtn.textContent = '📋 复制内容';
+            copyBtn.style.cssText = 'background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px; font-size: 14px;';
+            copyBtn.onclick = () => copyToClipboard(sentence);
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '❌ 关闭';
+            closeBtn.style.cssText = 'background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;';
+            closeBtn.onclick = () => document.body.removeChild(popup);
+
+            buttonContainer.appendChild(copyBtn);
+            buttonContainer.appendChild(closeBtn);
+
+            popup.appendChild(title);
+            popup.appendChild(content);
+            popup.appendChild(buttonContainer);
+
+          
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; cursor: pointer;';
+            overlay.onclick = () => document.body.removeChild(popup);
+
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+
+            // 按ESC键关闭
+            const handleEsc = (e) => {
+                if (e.key === 'Escape') {
+                    document.body.removeChild(popup);
+                    document.body.removeChild(overlay);
+                    document.removeEventListener('keydown', handleEsc);
+                }
+            };
+            document.addEventListener('keydown', handleEsc);
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopyNotification();
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopyNotification();
+            } catch (err) {
+                console.error('复制失败:', err);
+                alert('复制失败，请手动选择复制');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showCopyNotification() {
+            const notification = document.getElementById('copyNotification');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
+        }
+
+    
+        document.getElementById('secretNumber').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                decodeSecret();
+            }
+        });
+
+        // 页面加载完成后的提示
+        window.onload = function() {
+            console.log('嘿嘿');
+            console.log('请找神秘人获取');
+        };
+    </script>
+</body>
+</html>
