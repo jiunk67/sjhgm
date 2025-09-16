@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放器</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 25px;
+            width: 45%;
+            min-width: 300px;
+            transition: transform 0.3s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .video-description {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .play-button {
+            background: linear-gradient(to right, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(to right, #ee5a24, #ff6b6b);
+            transform: scale(1.05);
+        }
+
+        .video-player-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .video-player {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .control-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .video-card {
+                width: 90%;
+            }
+            
+            .video-player-container {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>登录教程</h1>
+        
+        <div class="button-container">
+            <!-- 第一个视频卡片 -->
+            <div class="video-card">
+                <h2 class="video-title">登录</h2>
+                <p class="video-description">
+                    账号的登录使用方式
+                </p>
+                <button class="play-button" onclick="playVideo('nature')">播放视频</button>
+            </div>
+
+            <!-- 第二个视频卡片 -->
+            <div class="video-card">
+                <h2 class="video-title">登录问题</h2>
+                <p class="video-description">
+                    用上面的方式登录后需要收验证码，如果此方法无效果，请联系管理员
+                </p>
+                <button class="play-button" onclick="playVideo('city')">播放视频</button>
+            </div>
+        </div>
+
+        <!-- 视频播放器容器 -->
+        <div id="videoPlayerContainer" class="video-player-container">
+            <video id="videoPlayer" class="video-player" controls>
+                <source id="videoSource" type="video/mp4">
+                您的浏览器不支持HTML5视频播放。
+            </video>
+            <div class="controls">
+                <button class="control-button" onclick="pauseVideo()">暂停</button>
+                <button class="control-button" onclick="stopVideo()">停止</button>
+                <button class="control-button" onclick="closePlayer()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 视频文件路径
+        const videos = {
+            'nature': 'a.mp4',
+            'city': 'b.mp4'
+        };
+
+        // 播放指定视频
+        function playVideo(videoId) {
+            const container = document.getElementById('videoPlayerContainer');
+            const player = document.getElementById('videoPlayer');
+            const source = document.getElementById('videoSource');
+            
+            // 设置视频源
+            source.src = videos[videoId];
+            player.load();
+            
+            // 显示播放器并播放
+            container.style.display = 'block';
+            player.play();
+            
+            // 滚动到播放器位置
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 暂停视频
+        function pauseVideo() {
+            const player = document.getElementById('videoPlayer');
+            player.pause();
+        }
+
+        // 停止视频
+        function stopVideo() {
+            const player = document.getElementById('videoPlayer');
+            player.pause();
+            player.currentTime = 0;
+        }
+
+        // 关闭播放器
+        function closePlayer() {
+            const container = document.getElementById('videoPlayerContainer');
+            stopVideo();
+            container.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
