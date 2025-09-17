@@ -3,145 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系统授权访问</title>
+    <title>密码验证</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
         }
-        .auth-container {
-            background-color: white;
+        
+        .login-container {
+            background: white;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: 350px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             text-align: center;
+            min-width: 300px;
         }
-        h1 {
+        
+        h2 {
             color: #333;
             margin-bottom: 30px;
-            font-size: 24px;
         }
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-        input {
+        
+        .password-input {
             width: 100%;
             padding: 15px;
-            border: 2px solid #e0e0e0;
+            margin: 20px 0;
+            border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
-            transition: all 0.3s;
-        }
-        input:focus {
-            border-color: #4CAF50;
+            box-sizing: border-box;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            transition: border-color 0.3s;
         }
-        button {
-            background: linear-gradient(to right, #4CAF50, #2E8B57);
+        
+        .password-input:focus {
+            border-color: #667eea;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px;
             border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
             font-size: 16px;
             font-weight: bold;
-            transition: all 0.3s;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-        button:hover {
+        
+        .login-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
-        #message {
+        
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
             margin-top: 20px;
-            padding: 12px;
+            padding: 10px;
             border-radius: 5px;
             font-weight: bold;
-            min-height: 20px;
-            opacity: 0;
-            transition: opacity 0.3s;
         }
-        .error {
-            color: #d32f2f;
-            background-color: #ffebee;
-            opacity: 1;
-        }
+        
         .success {
-            color: #388e3c;
-            background-color: #e8f5e9;
-            opacity: 1;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <h1>系统授权访问</h1>
-        <div class="input-group">
-            <input type="password" id="passwordInput" placeholder="密码错误无提示，正确后自动跳转" autocomplete="off">
-        </div>
-        <button onclick="verifyPassword()">验证授权</button>
-        <div id="message"></div>
+    <div id="loginPage" class="login-container">
+        <h2>请输入密码</h2>
+        <input type="password" id="passwordInput" class="password-input" placeholder="请输入密码" maxlength="1000">
+        <br>
+        <button id="loginBtn" class="login-btn" onclick="verifyPassword()">确定</button>
+        <div id="message" class="message hidden"></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
-        const CORRECT_PASSWORD_BASE64 = "NjY2NjY2";
+
+        const CORRECT_HASH = 'd7697570462f7562b83e81258de0f1e41832e98072e44c36ec8efec46786e24e';
         
-        function base64Decode(base64String) {
-            try {
-                return atob(base64String);
-            } catch (error) {
-                console.error("Base64解码错误:", error);
-                return null;
-            }
-        }
+        
+        const ENCRYPTED_TARGET = 'YW4uaHRtbA==';
         
         function verifyPassword() {
-            const passwordInput = document.getElementById('passwordInput');
-            const messageElement = document.getElementById('message');
-            const inputPassword = passwordInput.value.trim();
-            
-            messageElement.textContent = '';
-            messageElement.className = '';
+            const inputPassword = document.getElementById('passwordInput').value;
+            const messageDiv = document.getElementById('message');
+            const loginBtn = document.getElementById('loginBtn');
             
             if (!inputPassword) {
-                showMessage("请输入密码", "error");
-                passwordInput.focus();
+                showMessage('请输入密码', 'error');
                 return;
             }
             
-            const decodedCorrectPassword = base64Decode(CORRECT_PASSWORD_BASE64);
-            
-            if (decodedCorrectPassword === null) {
-                showMessage("系统错误，无法验证密码", "error");
+            if (inputPassword.length !== 4) {
+                showMessage('密码错误哦', 'error');
                 return;
             }
             
-            if (inputPassword === decodedCorrectPassword) {
-                showMessage("验证成功！正在跳转...", "success");
-                setTimeout(() => {
-                    window.location.href = "an.html";
+            const hashedInput = CryptoJS.SHA256(inputPassword).toString();
+            
+            if (hashedInput === CORRECT_HASH) {
+                showMessage('密码正确', 'success');
+                loginBtn.disabled = true;
+                
+           
+                const targetPage = atob(ENCRYPTED_TARGET);
+                setTimeout(function() {
+                    window.location.href = targetPage;
                 }, 1000);
             } else {
-                showMessage("密码错误！请找管理员获取正确密码", "error");
-                passwordInput.value = '';
-                passwordInput.focus();
+                showMessage('密码错误，请重试', 'error');
+                document.getElementById('passwordInput').value = '';
             }
         }
-        
-        function showMessage(message, type) {
-            const messageElement = document.getElementById('message');
-            messageElement.textContent = message;
-            messageElement.className = type;
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.classList.remove('hidden');
         }
-        
+
         document.getElementById('passwordInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 verifyPassword();
